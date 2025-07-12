@@ -1,0 +1,101 @@
+# ==============================================================================
+# Databricks Asset Bundle Configuration
+# ==============================================================================
+# Purpose: Configuration for Databricks Asset Bundles across environments
+# Author: DevOps Engineering Team
+# Version: 1.0
+# Last Updated: 2024
+# ==============================================================================
+
+# Bundle definition
+bundle:
+  name: my_bundle
+
+# Target environments configuration
+targets:
+  # Development environment (default)
+  dev:
+    # Set as default target
+    default: true
+    # Workspace configuration for development
+    workspace:
+      host: ${DATABRICKS_HOST_DEV}
+      root_path: ${ROOT_PATH_DEV}
+    # Development-specific variables
+    variables:
+      catalog: ${CATALOG_DEV}
+      schema: ${SCHEMA_DEV}
+  
+  # Quality Assurance environment
+  qa:
+    # Workspace configuration for QA
+    workspace:
+      host: ${DATABRICKS_HOST_QA}
+      root_path: ${ROOT_PATH_QA}
+    # QA-specific variables
+    variables:
+      catalog: ${CATALOG_QA}
+      schema: ${SCHEMA_QA}
+  
+  # Production environment
+  prod:
+    # Workspace configuration for production
+    workspace:
+      host: ${DATABRICKS_HOST_PROD}
+      root_path: ${ROOT_PATH_PROD}
+    # Production-specific variables
+    variables:
+      catalog: ${CATALOG_PROD}
+      schema: ${SCHEMA_PROD}
+
+# Resources definition
+resources:
+  # Workflow definition for smoke testing
+  jobs:
+    smoke-test:
+      name: "Smoke Test Workflow"
+      # Serverless compute configuration
+      job_clusters:
+        - job_cluster_key: "smoke_test_cluster"
+          new_cluster:
+            # Serverless cluster configuration using environment variables
+            spark_version: ${SPARK_VERSION}
+            node_type_id: ${NODE_TYPE_ID}
+            num_workers: ${NUM_WORKERS}
+            # Serverless configuration
+            enable_elastic_disk: true
+            data_security_mode: ${DATA_SECURITY_MODE}
+            runtime_engine: ${RUNTIME_ENGINE}
+      
+      # Task definition
+      tasks:
+        - task_key: "smoke_test_task"
+          job_cluster_key: "smoke_test_cluster"
+          # Notebook task configuration
+          notebook_task:
+            notebook_path: "/Workspace/smoketest/smoke_test.py"
+            base_parameters:
+              # Parameters passed to the notebook
+              table_name: ${SMOKE_TEST_TABLE_NAME}
+              environment: ${TARGET_ENVIRONMENT}
+              max_wait_time: ${MAX_WAIT_TIME}
+          
+          # Timeout configuration
+          timeout_seconds: ${TASK_TIMEOUT_SECONDS}
+          
+          # Retry configuration
+          retry_on_timeout: ${RETRY_ON_TIMEOUT}
+          max_retries: ${MAX_RETRIES}
+      
+      # Email notifications configuration
+      email_notifications:
+        on_failure: 
+          - ${NOTIFICATION_EMAIL_FAILURE}
+        on_success:
+          - ${NOTIFICATION_EMAIL_SUCCESS}
+      
+      # Schedule configuration (optional)
+      schedule:
+        quartz_cron_expression: ${SCHEDULE_CRON_EXPRESSION}
+        timezone_id: ${SCHEDULE_TIMEZONE}
+        pause_status: ${SCHEDULE_PAUSE_STATUS}

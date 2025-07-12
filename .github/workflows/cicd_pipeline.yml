@@ -1,0 +1,95 @@
+# ==============================================================================
+# Databricks CI/CD Pipeline - GitHub Actions Workflow
+# ==============================================================================
+# Purpose: Automated deployment of Databricks Asset Bundles with OIDC authentication
+# Author: DevOps Engineering Team
+# Version: 1.0
+# Last Updated: 2024
+# ==============================================================================
+
+name: "Databricks CI/CD Pipeline"
+
+# Workflow Triggers
+on:
+  # Manual trigger for on-demand deployments
+  workflow_dispatch:
+  # Automatic trigger on push to main branch
+  push:
+    branches:
+      - main
+
+# Environment variables for the entire workflow
+env:
+  AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+  AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+  AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+  DATABRICKS_HOST_DEV: ${{ secrets.DATABRICKS_HOST_DEV }}
+
+jobs:
+  # Deployment job for Databricks bundle
+  deploy:
+    name: "Deploy Databricks Bundle"
+    runs-on: ubuntu-latest
+    
+    steps:
+      # Step 1: Checkout the repository code
+      - name: "Checkout Repository"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      # Step 2: Setup Databricks CLI v2
+      - name: "Setup Databricks CLI"
+        uses: databricks/setup-cli@main
+        with:
+          databricks-cli-version: latest
+      
+      # Step 3: Configure OIDC authentication to Databricks
+      - name: "Configure OIDC Authentication"
+        run: |
+          echo "Configuring Databricks authentication using OIDC..."
+          databricks configure --host $DATABRICKS_HOST_DEV
+        env:
+          DATABRICKS_HOST: ${{ env.DATABRICKS_HOST_DEV }}
+          DATABRICKS_CLIENT_ID: ${{ env.AZURE_CLIENT_ID }}
+          DATABRICKS_CLIENT_SECRET: ${{ env.AZURE_CLIENT_SECRET }}
+      
+      # Step 4: Validate the Databricks bundle configuration
+      - name: "Validate Databricks Bundle"
+        run: |
+          echo "Validating Databricks bundle configuration..."
+          databricks bundle validate
+        env:
+          DATABRICKS_HOST: ${{ env.DATABRICKS_HOST_DEV }}
+          DATABRICKS_CLIENT_ID: ${{ env.AZURE_CLIENT_ID }}
+          DATABRICKS_CLIENT_SECRET: ${{ env.AZURE_CLIENT_SECRET }}
+      
+      # Step 5: Deploy the bundle to development environment
+      - name: "Deploy Bundle to Development"
+        run: |
+          echo "Deploying Databricks bundle to development environment..."
+          databricks bundle deploy --target dev --force-lock
+        env:
+          DATABRICKS_HOST: ${{ env.DATABRICKS_HOST_DEV }}
+          DATABRICKS_CLIENT_ID: ${{ env.AZURE_CLIENT_ID }}
+          DATABRICKS_CLIENT_SECRET: ${{ env.AZURE_CLIENT_SECRET }}
+      
+      # Step 6: Execute smoke test notebook
+      - name: "Run Smoke Test"
+        run: |
+          echo "Checking if smoke test notebook exists..."
+          if [ ! -f "smoketest/smoke_test.py" ]; then
+            echo "ERROR: Smoke test notebook not found at smoketest/smoke_test.py"
+            exit 1
+          fi
+          
+          echo "Running smoke test notebook..."
+          databricks workspace upload smoketest/smoke_test.py /Workspace/smoketest/smoke_test.py --overwrite
+          databricks jobs run-now --job-name "smoke-test" || {
+            echo "ERROR: Smoke test execution failed"
+            exit 1
+          }
+        env:
+          DATABRICKS_HOST: ${{ env.DATABRICKS_HOST_DEV }}
+          DATABRICKS_CLIENT_ID: ${{ env.AZURE_CLIENT_ID }}
+          DATABRICKS_CLIENT_SECRET: ${{ env.AZURE_CLIENT_SECRET }}

@@ -1,0 +1,177 @@
+{
+  "_comment_header": "==============================================================================",
+  "_comment_title": "Source-to-Target Mapping Configuration",
+  "_comment_purpose": "Maps prompt fields from configuration files to output files and sections",
+  "_comment_author": "DevOps Engineering Team",
+  "_comment_version": "1.0",
+  "_comment_updated": "2024",
+  "_comment_footer": "==============================================================================",
+  
+  "mappings": [
+    {
+      "source_prompt": "cicd_pipeline_prompt.json",
+      "source_field": "workflow_name",
+      "target_file": ".github/workflows/cicd_pipeline.yml",
+      "target_section": "name",
+      "transformation": "direct_string_mapping",
+      "data_type": "string",
+      "quality_check": "non_empty_string_validation"
+    },
+    {
+      "source_prompt": "cicd_pipeline_prompt.json",
+      "source_field": "trigger_events",
+      "target_file": ".github/workflows/cicd_pipeline.yml",
+      "target_section": "on",
+      "transformation": "array_to_yaml_triggers",
+      "data_type": "array",
+      "quality_check": "valid_github_trigger_events"
+    },
+    {
+      "source_prompt": "cicd_pipeline_prompt.json",
+      "source_field": "target_branch",
+      "target_file": ".github/workflows/cicd_pipeline.yml",
+      "target_section": "on.push.branches",
+      "transformation": "string_to_array",
+      "data_type": "string",
+      "quality_check": "valid_git_branch_name"
+    },
+    {
+      "source_prompt": "cicd_pipeline_prompt.json",
+      "source_field": "runner_type",
+      "target_file": ".github/workflows/cicd_pipeline.yml",
+      "target_section": "jobs.deploy.runs-on",
+      "transformation": "direct_string_mapping",
+      "data_type": "string",
+      "quality_check": "valid_github_runner_type"
+    },
+    {
+      "source_prompt": "cicd_pipeline_prompt.json",
+      "source_field": "azure_client_id",
+      "target_file": ".github/workflows/cicd_pipeline.yml",
+      "target_section": "env.AZURE_CLIENT_ID",
+      "transformation": "secret_reference_mapping",
+      "data_type": "secret_reference",
+      "quality_check": "valid_secret_reference_format"
+    },
+    {
+      "source_prompt": "cicd_pipeline_prompt.json",
+      "source_field": "azure_tenant_id",
+      "target_file": ".github/workflows/cicd_pipeline.yml",
+      "target_section": "env.AZURE_TENANT_ID",
+      "transformation": "secret_reference_mapping",
+      "data_type": "secret_reference",
+      "quality_check": "valid_secret_reference_format"
+    },
+    {
+      "source_prompt": "cicd_pipeline_prompt.json",
+      "source_field": "databricks_host",
+      "target_file": ".github/workflows/cicd_pipeline.yml",
+      "target_section": "env.DATABRICKS_HOST_DEV",
+      "transformation": "secret_reference_mapping",
+      "data_type": "secret_reference",
+      "quality_check": "valid_databricks_host_url"
+    },
+    {
+      "source_prompt": "dab_config_prompt.json",
+      "source_field": "bundle_name",
+      "target_file": "databricks.yml",
+      "target_section": "bundle.name",
+      "transformation": "direct_string_mapping",
+      "data_type": "string",
+      "quality_check": "valid_bundle_name_format"
+    },
+    {
+      "source_prompt": "dab_config_prompt.json",
+      "source_field": "environment_targets",
+      "target_file": "databricks.yml",
+      "target_section": "targets",
+      "transformation": "object_to_yaml_targets",
+      "data_type": "object",
+      "quality_check": "valid_environment_configuration"
+    },
+    {
+      "source_prompt": "dab_config_prompt.json",
+      "source_field": "default_environment",
+      "target_file": "databricks.yml",
+      "target_section": "targets.{env}.default",
+      "transformation": "boolean_flag_mapping",
+      "data_type": "string",
+      "quality_check": "single_default_environment_validation"
+    },
+    {
+      "source_prompt": "dab_config_prompt.json",
+      "source_field": "workspace_hosts",
+      "target_file": "databricks.yml",
+      "target_section": "targets.{env}.workspace.host",
+      "transformation": "environment_variable_mapping",
+      "data_type": "array",
+      "quality_check": "valid_databricks_workspace_urls"
+    },
+    {
+      "source_prompt": "dab_config_prompt.json",
+      "source_field": "root_paths",
+      "target_file": "databricks.yml",
+      "target_section": "targets.{env}.workspace.root_path",
+      "transformation": "environment_variable_mapping",
+      "data_type": "array",
+      "quality_check": "valid_workspace_path_format"
+    },
+    {
+      "source_prompt": "dab_config_prompt.json",
+      "source_field": "smoke_test_workflow",
+      "target_file": "databricks.yml",
+      "target_section": "resources.jobs.smoke-test",
+      "transformation": "workflow_configuration_mapping",
+      "data_type": "object",
+      "quality_check": "valid_databricks_job_configuration"
+    },
+    {
+      "source_prompt": "dab_config_prompt.json",
+      "source_field": "serverless_cluster_config",
+      "target_file": "databricks.yml",
+      "target_section": "resources.jobs.smoke-test.job_clusters",
+      "transformation": "cluster_configuration_mapping",
+      "data_type": "object",
+      "quality_check": "valid_serverless_cluster_configuration"
+    },
+    {
+      "source_prompt": "dab_config_prompt.json",
+      "source_field": "notebook_path",
+      "target_file": "databricks.yml",
+      "target_section": "resources.jobs.smoke-test.tasks.notebook_task.notebook_path",
+      "transformation": "workspace_path_mapping",
+      "data_type": "string",
+      "quality_check": "valid_workspace_notebook_path"
+    }
+  ],
+  
+  "transformation_rules": {
+    "direct_string_mapping": "Copy string value directly without modification",
+    "array_to_yaml_triggers": "Convert array of trigger events to YAML trigger format",
+    "string_to_array": "Convert single string to array format",
+    "secret_reference_mapping": "Map to GitHub secrets reference format",
+    "object_to_yaml_targets": "Convert object structure to YAML targets configuration",
+    "boolean_flag_mapping": "Set boolean flag based on environment selection",
+    "environment_variable_mapping": "Map to environment variable placeholder format",
+    "workflow_configuration_mapping": "Convert workflow definition to Databricks job format",
+    "cluster_configuration_mapping": "Map cluster configuration to Databricks format",
+    "workspace_path_mapping": "Format path for Databricks workspace structure"
+  },
+  
+  "quality_checks": {
+    "non_empty_string_validation": "Ensure string is not empty or null",
+    "valid_github_trigger_events": "Validate against allowed GitHub trigger events",
+    "valid_git_branch_name": "Ensure branch name follows Git naming conventions",
+    "valid_github_runner_type": "Validate against available GitHub runner types",
+    "valid_secret_reference_format": "Ensure proper GitHub secrets reference syntax",
+    "valid_databricks_host_url": "Validate Databricks workspace URL format",
+    "valid_bundle_name_format": "Ensure bundle name follows Databricks conventions",
+    "valid_environment_configuration": "Validate environment target structure",
+    "single_default_environment_validation": "Ensure only one environment is marked as default",
+    "valid_databricks_workspace_urls": "Validate all workspace URLs are accessible",
+    "valid_workspace_path_format": "Ensure workspace paths follow Databricks conventions",
+    "valid_databricks_job_configuration": "Validate job configuration against Databricks API",
+    "valid_serverless_cluster_configuration": "Ensure serverless cluster config is valid",
+    "valid_workspace_notebook_path": "Validate notebook path exists in workspace"
+  }
+}
