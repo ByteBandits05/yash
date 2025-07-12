@@ -1,0 +1,78 @@
+# ==============================================================================
+# Databricks Asset Bundle Configuration
+# ==============================================================================
+# Purpose: Multi-environment configuration for Databricks workspace deployments
+# Environments: Development, QA, and Production with parameterized settings
+# Features: Serverless compute, workspace management, and smoke test workflow
+# ==============================================================================
+
+# Bundle definition - core bundle configuration
+bundle:
+  name: my_bundle  # Placeholder bundle name - customize as needed
+
+# Target environments configuration
+targets:
+  
+  # Development environment - default target for local development
+  dev:
+    default: true  # Set as default deployment target
+    workspace:
+      host: ${DATABRICKS_HOST_DEV}      # Development workspace URL
+      root_path: ${ROOT_PATH_DEV}       # Development workspace root path
+    
+  # Quality Assurance environment - for testing and validation
+  qa:
+    workspace:
+      host: ${DATABRICKS_HOST_QA}       # QA workspace URL  
+      root_path: ${ROOT_PATH_QA}        # QA workspace root path
+      
+  # Production environment - for live workloads
+  prod:
+    workspace:
+      host: ${DATABRICKS_HOST_PROD}     # Production workspace URL
+      root_path: ${ROOT_PATH_PROD}      # Production workspace root path
+
+# Workflow definitions - automated job configurations
+workflows:
+  
+  # Smoke test workflow - validates deployment health
+  smoke-test:
+    name: ${WORKFLOW_NAME_SMOKE_TEST}   # Workflow display name
+    
+    # Notebook task configuration
+    tasks:
+      - task_key: smoke_test_task
+        notebook_task:
+          notebook_path: /Workspace/smoketest/smoke_test.py
+          base_parameters:
+            environment: ${TARGET_ENVIRONMENT}
+            
+    # Serverless compute configuration
+    job_clusters:
+      - job_cluster_key: ${JOB_CLUSTER_KEY}
+        new_cluster:
+          # Cluster specifications - all parameterized
+          spark_version: ${SPARK_VERSION}
+          node_type_id: ${NODE_TYPE_ID}
+          driver_node_type_id: ${DRIVER_NODE_TYPE_ID}
+          num_workers: ${NUM_WORKERS}
+          
+          # Serverless compute settings
+          enable_elastic_disk: ${ENABLE_ELASTIC_DISK}
+          data_security_mode: ${DATA_SECURITY_MODE}
+          runtime_engine: ${RUNTIME_ENGINE}
+          
+          # Auto-scaling configuration
+          autoscale:
+            min_workers: ${MIN_WORKERS}
+            max_workers: ${MAX_WORKERS}
+            
+    # Email notifications configuration  
+    email_notifications:
+      on_start: ${EMAIL_ON_START}
+      on_success: ${EMAIL_ON_SUCCESS}
+      on_failure: ${EMAIL_ON_FAILURE}
+      
+    # Timeout and retry settings
+    timeout_seconds: ${TIMEOUT_SECONDS}
+    max_concurrent_runs: ${MAX_CONCURRENT_RUNS}
