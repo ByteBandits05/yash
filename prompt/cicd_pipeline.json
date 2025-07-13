@@ -1,0 +1,42 @@
+{
+  "system": "You are an expert DevOps engineer skilled in Databricks, GitHub Actions, Azure AD OIDC, prompt engineering, and CI/CD automation for enterprise analytics. Generate robust, standards-compliant YAML and JSON configuration files, plus a Python smoke test script, all with correct headers, section comments, file naming, and full parameterization as described below.",
+  "user": "Generate the following four files for a Databricks CI/CD pipeline with Asset Bundles and OIDC authentication:\n\
+\n\
+1. GitHub Actions Workflow (`cicd_pipeline.yml`) to be saved as `.github/workflows/cicd_pipeline.yml`:\n\
+   - Workflow name: `Databricks CI/CD Pipeline`.\n\
+   - Triggers: `workflow_dispatch` and push to `main`.\n\
+   - Job: `deploy` on `ubuntu-latest`.\n\
+   - Steps:\n\
+     * Checkout repo (`actions/checkout@v4`).\n\
+     * Setup Databricks CLI v2 (`databricks/setup-cli@main`).\n\
+     * OIDC auth to Databricks using GitHub secrets (`AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_CLIENT_SECRET`, `DATABRICKS_HOST_DEV`).\n\
+     * Validate bundle: `databricks bundle validate`.\n\
+     * Deploy: `databricks bundle deploy --target dev --force-lock`.\n\
+     * Run the smoke test notebook at `smoketest/smoke_test.py` using Databricks CLI. Fail workflow with error if notebook not found.\n\
+     * All secrets/environment values must be mapped via `env:` (no hardcoded credentials).\n\
+     * Each step must have comments and the file must start with a header as per event documentation.\n\
+\n\
+2. Databricks Asset Bundle YAML (`databricks.yml`):\n\
+   - File: `databricks.yml` in repo root.\n\
+   - `bundle` section: `name: my_bundle` (placeholder).\n\
+   - `targets` for `dev`, `qa`, `prod` with `workspace` block—host and root_path as `${DATABRICKS_HOST_DEV}`, `${ROOT_PATH_DEV}` (etc).\n\
+   - Only `dev` has `default: true`.\n\
+   - Workflow `smoke-test` to run `/Workspace/smoketest/smoke_test.py` on a serverless cluster; all cluster/resource config as env variable placeholders.\n\
+   - All sections commented for clarity, file starts with header.\n\
+\n\
+3. Source-to-Target Mapping JSON (`sttm_prompt_to_file.json`):\n\
+   - Map prompt fields from `cicd_pipeline_prompt.json` and `dab_config_prompt.json` to output files/sections.\n\
+   - Each entry must include: source_prompt, source_field, target_file, target_section/step, transformation, data_type, quality_check.\n\
+   - Start with JSON comment block header, per event style.\n\
+\n\
+4. Smoke Test Python Script (`smoke_test.py`) in `smoketest/` folder:\n\
+   - Script connects to Databricks using OIDC credentials and validates that a specified table (name given as environment variable) exists and contains at least one row.\n\
+   - All connection parameters and table name must be read from environment variables (no hardcoded values).\n\
+   - Print results and exit with error if table not found or empty.\n\
+   - File starts with a header as a Python comment, matching event documentation style.\n\
+\n\
+For all four files:\n\
+- Output as code blocks, each starting with a header showing the filename and its purpose, matching your event documentation style.\n\
+- Do not include any explanation or extra text outside the code blocks.\n\
+- All files must be parameterized, reusable, and standards compliant."
+}
