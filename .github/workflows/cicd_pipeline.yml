@@ -29,14 +29,14 @@ jobs:
         uses: databricks/setup-cli@main
 
       # Authenticate with OIDC to Databricks
-      - name: OIDC Auth to Databricks
-        run: |
-          echo "Authenticating to Databricks using OIDC..."
-        env:
-          AZURE_CLIENT_ID: ${{ env.AZURE_CLIENT_ID }}
-          AZURE_TENANT_ID: ${{ env.AZURE_TENANT_ID }}
-          AZURE_CLIENT_SECRET: ${{ env.AZURE_CLIENT_SECRET }}
-          DATABRICKS_HOST: ${{ env.DATABRICKS_HOST_DEV }}
+      # - name: OIDC Auth to Databricks
+      #   run: |
+      #     echo "Authenticating to Databricks using OIDC..."
+      #   env:
+      #     AZURE_CLIENT_ID: ${{ env.AZURE_CLIENT_ID }}
+      #     AZURE_TENANT_ID: ${{ env.AZURE_TENANT_ID }}
+      #     AZURE_CLIENT_SECRET: ${{ env.AZURE_CLIENT_SECRET }}
+      #     DATABRICKS_HOST: ${{ env.DATABRICKS_HOST_DEV }}
 
       # Validate the asset bundle
       - name: Validate Databricks Bundle
