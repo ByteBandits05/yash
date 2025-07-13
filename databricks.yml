@@ -8,17 +8,17 @@ targets:
   dev:
     default: true # Default deployment target
     workspace:
-      host: ${DATABRICKS_HOST} # Dev workspace host from env
-      root_path: ${ROOT_PATH} # Dev root path from env
+      host: https://dbc-d56de9ca-1926.cloud.databricks.com/ # Dev workspace host from env
+      root_path: /Workspace/DAB/ # Dev root path from env
 
   qa:
     workspace:
-      host: ${DATABRICKS_HOST} # QA workspace host from env
+      host: https://dbc-d56de9ca-1926.cloud.databricks.com/ # QA workspace host from env
       root_path: ${ROOT_PATH} # QA root path from env
 
   prod:
     workspace:
-      host: ${DATABRICKS_HOST} # Prod workspace host from env
+      host: https://dbc-d56de9ca-1926.cloud.databricks.com/ # Prod workspace host from env
       root_path: ${ROOT_PATH} # Prod root path from env
 
 workflows:
