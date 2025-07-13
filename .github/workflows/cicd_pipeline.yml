@@ -1,0 +1,57 @@
+# .github/workflows/cicd_pipeline.yml
+# Purpose: GitHub Actions Workflow for Databricks CI/CD Pipeline with OIDC Authentication
+
+name: Databricks CI/CD Pipeline
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+      DATABRICKS_HOST_DEV: ${{ secrets.DATABRICKS_HOST_DEV }}
+      ROOT_PATH_DEV: ${{ secrets.ROOT_PATH_DEV }}
+      SMOKE_TEST_TABLE: ${{ secrets.SMOKE_TEST_TABLE }}
+    steps:
+      # Checkout source code
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Setup Databricks CLI v2
+      - name: Setup Databricks CLI
+        uses: databricks/setup-cli@main
+
+      # Authenticate with OIDC to Databricks
+      - name: OIDC Auth to Databricks
+        run: |
+          echo "Authenticating to Databricks using OIDC..."
+        env:
+          AZURE_CLIENT_ID: ${{ env.AZURE_CLIENT_ID }}
+          AZURE_TENANT_ID: ${{ env.AZURE_TENANT_ID }}
+          AZURE_CLIENT_SECRET: ${{ env.AZURE_CLIENT_SECRET }}
+          DATABRICKS_HOST: ${{ env.DATABRICKS_HOST_DEV }}
+
+      # Validate the asset bundle
+      - name: Validate Databricks Bundle
+        run: databricks bundle validate
+
+      # Deploy the asset bundle to the dev environment
+      - name: Deploy to Dev
+        run: databricks bundle deploy --target dev --force-lock
+
+      # Run smoke test notebook
+      - name: Run Smoke Test
+        run: |
+          if [ ! -f smoketest/smoke_test.py ]; then
+            echo "Smoke test script not found!"
+            exit 1
+          fi
+          databricks workspace import smoketest/smoke_test.py /Workspace/smoketest/smoke_test.py --overwrite
+          python smoketest/smoke_test.py
