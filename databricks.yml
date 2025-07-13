@@ -1,0 +1,36 @@
+# databricks.yml
+# Purpose: Databricks Asset Bundle Configuration for CI/CD Pipeline
+
+bundle:
+  name: my_bundle # Placeholder for bundle name
+
+targets:
+  dev:
+    default: true # Default deployment target
+    workspace:
+      host: ${DATABRICKS_HOST_DEV} # Dev workspace host from env
+      root_path: ${ROOT_PATH_DEV} # Dev root path from env
+
+  qa:
+    workspace:
+      host: ${DATABRICKS_HOST_QA} # QA workspace host from env
+      root_path: ${ROOT_PATH_QA} # QA root path from env
+
+  prod:
+    workspace:
+      host: ${DATABRICKS_HOST_PROD} # Prod workspace host from env
+      root_path: ${ROOT_PATH_PROD} # Prod root path from env
+
+workflows:
+  smoke-test:
+    name: Smoke Test Workflow
+    tasks:
+      - task_key: smoke_test
+        notebook_task:
+          notebook_path: /Workspace/smoketest/smoke_test.py # Path to smoke test notebook
+        new_cluster:
+          spark_version: ${SPARK_VERSION} # Configurable via env
+          node_type_id: ${NODE_TYPE_ID} # Configurable via env
+          num_workers: ${NUM_WORKERS} # Configurable via env
+        environment:
+          SMOKE_TEST_TABLE: ${SMOKE_TEST_TABLE}
