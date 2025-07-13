@@ -1,0 +1,41 @@
+// sttm_prompt_to_file.json
+// Purpose: Source-to-Target Mapping between prompt fields and CI/CD output files
+
+[
+  {
+    "source_prompt": "cicd_pipeline_prompt.json",
+    "source_field": "workflow_name",
+    "target_file": ".github/workflows/cicd_pipeline.yml",
+    "target_section/step": "name",
+    "transformation": "direct mapping",
+    "data_type": "string",
+    "quality_check": "must not be empty"
+  },
+  {
+    "source_prompt": "dab_config_prompt.json",
+    "source_field": "bundle_name",
+    "target_file": "databricks.yml",
+    "target_section/step": "bundle.name",
+    "transformation": "direct mapping",
+    "data_type": "string",
+    "quality_check": "must match naming standards"
+  },
+  {
+    "source_prompt": "cicd_pipeline_prompt.json",
+    "source_field": "smoke_test_table",
+    "target_file": "smoketest/smoke_test.py",
+    "target_section/step": "env variable usage",
+    "transformation": "direct mapping",
+    "data_type": "string",
+    "quality_check": "must be valid table name"
+  },
+  {
+    "source_prompt": "cicd_pipeline_prompt.json",
+    "source_field": "environment_variables",
+    "target_file": ".github/workflows/cicd_pipeline.yml",
+    "target_section/step": "env",
+    "transformation": "direct mapping",
+    "data_type": "object",
+    "quality_check": "must contain required secrets"
+  }
+]
