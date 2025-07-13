@@ -12,13 +12,13 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    env:
-      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-      AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-      DATABRICKS_HOST_DEV: ${{ secrets.DATABRICKS_HOST_DEV }}
-      ROOT_PATH_DEV: ${{ secrets.ROOT_PATH_DEV }}
-      SMOKE_TEST_TABLE: ${{ secrets.SMOKE_TEST_TABLE }}
+    # env:
+    #   AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+    #   AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+    #   AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+    #   DATABRICKS_HOST_DEV: ${{ secrets.DATABRICKS_HOST_DEV }}
+    #   ROOT_PATH_DEV: ${{ secrets.ROOT_PATH_DEV }}
+    #   SMOKE_TEST_TABLE: ${{ secrets.SMOKE_TEST_TABLE }}
     steps:
       # Checkout source code
       - name: Checkout repository
