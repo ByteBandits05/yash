@@ -1,25 +1,30 @@
 # databricks.yml
 # Purpose: Databricks Asset Bundle Configuration for CI/CD Pipeline
+#
+# Security Note: Access tokens should be configured via environment variables
+# or a secrets manager (e.g., DATABRICKS_TOKEN, Azure Key Vault,
+# AWS Secrets Manager) for enhanced security. Do NOT include access tokens
+# directly in this file.
 
 bundle:
-  name: my_bundle # Placeholder for bundle name
+  name: my_bundle  # Placeholder for bundle name
 
 targets:
   dev:
-    default: true # Default deployment target
+    default: true  # Default deployment target
     workspace:
-      host: ${DATABRICKS_HOST_DEV} # Dev workspace host from env
-      root_path: ${ROOT_PATH_DEV} # Dev root path from env
+      host: https://dbc-d56de9ca-1926.cloud.databricks.com/
+      root_path: ${ROOT_PATH_DEV}  # Dev root path from env
 
   qa:
     workspace:
-      host: ${DATABRICKS_HOST_QA} # QA workspace host from env
-      root_path: ${ROOT_PATH_QA} # QA root path from env
+      host: https://dbc-d56de9ca-1926.cloud.databricks.com/
+      root_path: ${ROOT_PATH_QA}  # QA root path from env
 
   prod:
     workspace:
-      host: ${DATABRICKS_HOST_PROD} # Prod workspace host from env
-      root_path: ${ROOT_PATH_PROD} # Prod root path from env
+      host: https://dbc-d56de9ca-1926.cloud.databricks.com/
+      root_path: ${ROOT_PATH_PROD}  # Prod root path from env
 
 workflows:
   smoke-test:
